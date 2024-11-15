@@ -5,7 +5,9 @@ import os
 from menu import menu
 from bs4 import BeautifulSoup
 from selenium import webdriver
-
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
 url = "https://animefire.plus/pesquisar/" + "-".join(input("Pesquisar anime: ").split())
 # Your HTML content
@@ -36,25 +38,26 @@ if selected == "EXIT":
 
 url_episode = episode_links[int(selected) - 1]
 
-season = 1
-episode = selected
-anime_slug = url_episode.split("/")[-2]
+print(url_episode)
 
-print(anime_slug)
+# instantiate a Chrome options object
+options =webdriver.ChromeOptions()
 
-res = requests.get("http://0.0.0.0:1010/episode/" + anime_slug + "/" + str(season) + "/" + episode)
-json_res = json.loads(res.text)
+# set the options to use Chrome in headless mode
+options.add_argument("--headless=new")
 
-for data in json_res["data"]:
-    for episode in data["episodes"]:
-        episode_link = episode["episode"]
-        if episode_link is None:
-            continue
-        print(episode_link)
-        if episode_link.startswith("https://www.blogger.com"):
-            os.system(f"yt-dlp '{episode_link}' -o ./test.mp4 | vlc test.mp4.part --play-and-pause")
-            os.system("rm ./test.mp4 ./test.mp4.part")
-            break
-        elif episode_link.endswith(".mp4"):
-            os.system(f"vlc {episode_link} --play-and-pause") 
-            break
+# initialize an instance of the Chrome driver (browser) in headless mode
+driver = webdriver.Chrome(options=options)
+
+# visit your target site
+driver.get(url_episode)
+
+element = WebDriverWait(driver, 5).until(
+    EC.visibility_of_all_elements_located((By.ID, "my-video_html5_api"))
+)
+product = driver.find_element(By.ID, "my-video_html5_api")
+
+link = product.get_property("src")
+
+
+os.system(f"mpv '{link}'")
