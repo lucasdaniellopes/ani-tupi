@@ -1,5 +1,5 @@
 # Requisitos
-mpv, python, venv e pip
+mpv, firefox, python, venv e pip
 
 # Instalar
 Clone o repositório e execute os seguintes comandos.
