@@ -35,13 +35,9 @@ if __name__=="__main__":
 
     url_episode = episode_links[int(selected) - 1]
     print("Procurando video em:", url_episode)
-    # instantiate a Chrome options object
-    options =webdriver.ChromeOptions()
-    # set the options to use Chrome in headless mode
-    options.add_argument("--headless=new")
-    # initialize an instance of the Chrome driver (browser) in headless mode
-    driver = webdriver.Chrome(options=options)
-    # visit your target site
+    options =webdriver.FirefoxOptions()
+    options.add_argument("--headless")
+    driver = webdriver.Firefox(options=options)
     driver.get(url_episode)
 
     try:
