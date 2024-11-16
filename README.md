@@ -1,3 +1,6 @@
+# Requisitos
+mpv, google chrome, python, venv e pip
+
 # Instalar
 Clone o repositório e execute os seguintes comandos.
 ```bash
