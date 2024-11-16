@@ -1,4 +1,4 @@
-#Instalar
+# Instalar
 Clone o repositório e execute os seguintes comandos.
 ```bash
 python -m venv venv
@@ -7,7 +7,7 @@ pip install -r requirements.txt
 ./build.sh
 ```
 
-#Usar
+# Usar
 Basta usar agora.
 ```bash
 ani-tupi
