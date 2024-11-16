@@ -1,0 +1,4 @@
+create querying algorithm to get slug form
+see how to create interactive mode
+use jq to parse sugoi api
+fuckin learn that regex bullshit crap and sed
