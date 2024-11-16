@@ -50,16 +50,14 @@ if __name__=="__main__":
             EC.visibility_of_all_elements_located(params)
         )
     except:
-        pass
-
-    try:
-        params = (By.XPATH, "/html/body/div[2]/div[2]/div/div[1]/div[1]/div/div/div[2]/div[4]/iframe")
-        element = WebDriverWait(driver, 10).until(
-            EC.visibility_of_all_elements_located(params)
-        )
-    except:
-        print("AnimeFire não tem mais esse video ou foi hospedado no YouTube.")
-        exit()
+        try:
+            params = (By.XPATH, "/html/body/div[2]/div[2]/div/div[1]/div[1]/div/div/div[2]/div[4]/iframe")
+            element = WebDriverWait(driver, 10).until(
+                EC.visibility_of_all_elements_located(params)
+            )
+        except:
+            print("AnimeFire não tem mais esse video ou foi hospedado no YouTube.")
+            exit()
 
     product = driver.find_element(params[0], params[1])
     link = product.get_property("src")
