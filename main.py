@@ -1,6 +1,7 @@
 import requests
 import json
 import os
+from sys import exit
 from menu import menu
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -33,7 +34,7 @@ if __name__=="__main__":
         exit()
 
     url_episode = episode_links[int(selected) - 1]
-    print("Carregando video encontrado em:", url_episode)
+    print("Procurando video em:", url_episode)
     # instantiate a Chrome options object
     options =webdriver.ChromeOptions()
     # set the options to use Chrome in headless mode
@@ -44,14 +45,22 @@ if __name__=="__main__":
     driver.get(url_episode)
 
     try:
-        element = WebDriverWait(driver, 5).until(
-            EC.visibility_of_all_elements_located((By.ID, "my-video_html5_api"))
+        params = (By.ID, "my-video_html5_api")
+        element = WebDriverWait(driver, 10).until(
+            EC.visibility_of_all_elements_located(params)
+        )
+    except:
+        pass
+
+    try:
+        params = (By.XPATH, "/html/body/div[2]/div[2]/div/div[1]/div[1]/div/div/div[2]/div[4]/iframe")
+        element = WebDriverWait(driver, 10).until(
+            EC.visibility_of_all_elements_located(params)
         )
     except:
         print("AnimeFire não tem mais esse video ou foi hospedado no YouTube.")
         exit()
 
-    product = driver.find_element(By.ID, "my-video_html5_api")
-
+    product = driver.find_element(params[0], params[1])
     link = product.get_property("src")
     os.system(f"mpv '{link}'")
