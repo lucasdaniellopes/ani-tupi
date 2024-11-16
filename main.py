@@ -1,6 +1,5 @@
 import requests
-import json
-import os
+import subprocess
 from sys import exit
 from menu import menu
 from bs4 import BeautifulSoup
@@ -53,8 +52,10 @@ if __name__=="__main__":
             )
         except:
             print("AnimeFire não tem mais esse video ou foi hospedado no YouTube.")
+            driver.quit()
             exit()
 
     product = driver.find_element(params[0], params[1])
     link = product.get_property("src")
-    os.system(f"mpv '{link}'")
+    driver.quit()
+    subprocess.run(["mpv", link])
