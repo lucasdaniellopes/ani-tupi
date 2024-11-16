@@ -1,4 +1,5 @@
 #Instalar
+Clone o repositório e execute os seguintes comandos.
 ```bash
 python -m venv venv
 source ./venv/bin/activate
