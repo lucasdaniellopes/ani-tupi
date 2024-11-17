@@ -58,4 +58,8 @@ if __name__=="__main__":
     product = driver.find_element(params[0], params[1])
     link = product.get_property("src")
     driver.quit()
-    subprocess.run(["mpv", link])
+
+    try:
+        subprocess.run(["mpv", link])
+    except:
+        print("mpv não encontrado ou houveram problemas na sua execução.")
