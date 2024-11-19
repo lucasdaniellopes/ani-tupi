@@ -1,7 +1,13 @@
 # Requisitos
 mpv, firefox, python, venv e pip
 
-# Instalar
+# Release
+Basta dar direito de execução a release mais atual e usar.
+```bash
+chmod +x ani-tupi
+```
+
+# Buildar do código-fonte
 Clone o repositório e execute os seguintes comandos.
 
 ## Linux
