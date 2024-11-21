@@ -22,30 +22,27 @@ def is_firefox_installed_as_snap():
         print("Snap is not installed on this system.")
         return False
 
-if __name__=="__main__":
+def search_anime():
     url = "https://animefire.plus/pesquisar/" + "-".join(input("Pesquisar anime: ").split())
     print("Buscando...")
-    # Your HTML content
     html_content = requests.get(url)
-    # Parse the HTML with BeautifulSoup
     soup = BeautifulSoup(html_content.text, 'html.parser')
-    # Find all the titles
     titles_link = [div.article.a["href"] for div in soup.find_all('div', class_='col-6 col-sm-4 col-md-3 col-lg-2 mb-1 minWDanime divCardUltimosEps') if 'title' in div.attrs]
     titles = [h3.get_text() for h3 in soup.find_all("h3", class_="animeTitle")]
     selected = menu(titles)
-    if selected == "EXIT":
-        exit()
-
     url_episodes = titles_link[titles.index(selected)]
+    return url_episodes
+
+def search_episode(url_episodes):
     html_episodes_page = requests.get(url_episodes)
     soup = BeautifulSoup(html_episodes_page.text, "html.parser")
     episode_links = [a["href"] for a in soup.find_all('a', class_="lEp epT divNumEp smallbox px-2 mx-1 text-left d-flex")]
     opts = [str(i) for i in range(1, len(episode_links)+1)]
     selected = menu(opts)
-    if selected == "EXIT":
-        exit()
-
     url_episode = episode_links[int(selected) - 1]
+    return int(selected) - 1, episode_links 
+
+def find_player_link(url_episode):
     print("Procurando video em:", url_episode)
     options = webdriver.FirefoxOptions()
     options.add_argument("--headless")
@@ -58,13 +55,13 @@ if __name__=="__main__":
 
     try:
         params = (By.ID, "my-video_html5_api")
-        element = WebDriverWait(driver, 10).until(
+        element = WebDriverWait(driver, 7).until(
             EC.visibility_of_all_elements_located(params)
         )
     except:
         try:
             params = (By.XPATH, "/html/body/div[2]/div[2]/div/div[1]/div[1]/div/div/div[2]/div[4]/iframe")
-            element = WebDriverWait(driver, 10).until(
+            element = WebDriverWait(driver, 7).until(
                 EC.visibility_of_all_elements_located(params)
             )
         except:
@@ -75,8 +72,33 @@ if __name__=="__main__":
     product = driver.find_element(params[0], params[1])
     link = product.get_property("src")
     driver.quit()
+    return link
 
+def play_episode(link, idx):
     try:
         subprocess.run(["mpv", link])
     except:
         print("mpv não encontrado ou houveram problemas na sua execução.")
+        exit()
+
+    opts = ["Proximo episodio"]
+    opt = menu(opts)
+    if opt == "Proximo episodio":
+        idx += 1
+        return idx
+    else:
+        return -1
+
+if __name__=="__main__":
+    url_episodes = search_anime()
+    idx, episode_links = search_episode(url_episodes)
+    link = find_player_link(episode_links[idx])
+    idx = play_episode(link, idx)
+    
+    while idx != -1 and idx < len(episode_links):
+        link = find_player_link(episode_links[idx])
+        idx = play_episode(link, idx)
+
+    if idx >= len(episode_links):
+        print("Sem mais episodios!")
+    
