@@ -1,5 +1,5 @@
 import curses
-
+from sys import exit
 
 def __menu(stdscr, menu, result) -> str:
     menu.append("EXIT")
@@ -52,6 +52,8 @@ def __menu(stdscr, menu, result) -> str:
 def menu(opts: list[str]) -> str:
     selected = [] 
     curses.wrapper(lambda stdscr: __menu(stdscr, opts, result=selected))
+    if selected[0] == "EXIT":
+        exit()
     return selected[0]
 
 if __name__ == "__main__":
