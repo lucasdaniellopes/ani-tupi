@@ -1,3 +1,5 @@
+[![Demo](https://img.youtube.com/vi/eug6gKLTD3I/maxresdefault.jpg)]([https://youtu.be/T-D1KVIuvjA](https://youtu.be/eug6gKLTD3I))
+
 # Requisitos
 mpv, firefox, python, venv e pip
 
