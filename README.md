@@ -4,7 +4,7 @@ mpv, firefox, python, venv e pip
 # Release
 Basta dar direito de execução a release mais atual e usar.
 ```bash
-chmod +x ani-tupi
+chmod +x ./ani-tupi
 ```
 
 # Buildar do código-fonte
