@@ -1,17 +1,15 @@
 import curses
 from sys import exit
 
+
 def __menu(stdscr, menu, result) -> str:
     menu.append("EXIT")
-    # Clear the screen
     stdscr.clear()
-    curses.curs_set(0)  # Hide the cursor
+    curses.curs_set(0)  
     
-    # Initialize colors
     curses.start_color()
     curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_YELLOW)  # Black text on yellow background
 
-    # Define menu 
     current_option = 0
     screen_height, screen_width = stdscr.getmaxyx()
     display_height = screen_height - 2  # Leave space for padding at the top and bottom
@@ -29,8 +27,6 @@ def __menu(stdscr, menu, result) -> str:
                 stdscr.attroff(curses.color_pair(1))
             else:
                 stdscr.addstr(idx + 1, 2, row)
-
-        # Get user input
         key = stdscr.getch()
 
         # Arrow key navigation
@@ -43,9 +39,6 @@ def __menu(stdscr, menu, result) -> str:
             if current_option >= end_index or current_option == 0:
                 start_index = current_option
         elif key == curses.KEY_ENTER or key in [10, 13]:
-            #stdscr.addstr(len(menu) + 3, 2, f"You selected '{menu[current_option]}'")
-            #stdscr.refresh()
-            #stdscr.getch()  # Wait for another key press
             result.append(menu[current_option])
             break
 

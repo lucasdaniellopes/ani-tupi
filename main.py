@@ -39,7 +39,6 @@ def search_episode(url_episodes):
     episode_links = [a["href"] for a in soup.find_all('a', class_="lEp epT divNumEp smallbox px-2 mx-1 text-left d-flex")]
     opts = [str(i) for i in range(1, len(episode_links)+1)]
     selected = menu(opts)
-    url_episode = episode_links[int(selected) - 1]
     return int(selected) - 1, episode_links 
 
 def find_player_link(url_episode):
