@@ -1,6 +1,5 @@
 import requests
 import subprocess
-import threading
 from sys import exit
 from menu import menu
 from bs4 import BeautifulSoup
