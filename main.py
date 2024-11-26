@@ -19,7 +19,6 @@ def is_firefox_installed_as_snap():
         )
         return result.returncode == 0  # Return code 0 means Firefox is installed as a snap
     except FileNotFoundError:
-        print("Snap is not installed on this system.")
         return False
 
 def search_anime():
@@ -45,11 +44,17 @@ def find_player_link(url_episode):
     print("Procurando video em:", url_episode)
     options = webdriver.FirefoxOptions()
     options.add_argument("--headless")
-    if is_firefox_installed_as_snap():
-        service = webdriver.FirefoxService(executable_path="/snap/bin/geckodriver")
-        driver = webdriver.Firefox(options=options, service = service)
-    else:
-        driver = webdriver.Firefox(options=options)
+
+    try:
+        if is_firefox_installed_as_snap():
+            service = webdriver.FirefoxService(executable_path="/snap/bin/geckodriver")
+            driver = webdriver.Firefox(options=options, service = service)
+        else:
+            driver = webdriver.Firefox(options=options)
+    except:
+        print("Firefox não encontrado.")
+        exit()
+
     driver.get(url_episode)
 
     try:
@@ -75,15 +80,17 @@ def find_player_link(url_episode):
 
 def play_episode(link):
     try:
-        subprocess.Popen(
+        process = subprocess.Popen(
                 f"mpv {link} --fullscreen --cursor-autohide-fs-only",
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
                 shell=True
                 )
-    except:
-        print("mpv não encontrado ou houveram problemas na sua execução.")
+        if process.returncode != 0: 
+            raise Exception("mpv não encontrado ou houveram problemas na sua execução.")
+    except Exception as e:
+        print(repr(e))
         exit()
 
 def player_control(idx, total):
@@ -92,6 +99,7 @@ def player_control(idx, total):
         opts.append("Próximo")
     if idx > 0:
         opts.append("Anterior")
+
     msg = "Aguarde o player..."
     opt = menu(opts, msg)
     if opt == "Próximo":
