@@ -1,5 +1,6 @@
 import requests
 import subprocess
+import threading
 from sys import exit
 from menu import menu
 from bs4 import BeautifulSoup
@@ -33,13 +34,13 @@ def search_anime():
     url_episodes = titles_link[titles.index(selected)]
     return url_episodes
 
-def search_episode(url_episodes):
+def search_episodes(url_episodes):
     html_episodes_page = requests.get(url_episodes)
     soup = BeautifulSoup(html_episodes_page.text, "html.parser")
     episode_links = [a["href"] for a in soup.find_all('a', class_="lEp epT divNumEp smallbox px-2 mx-1 text-left d-flex")]
-    opts = [str(i) for i in range(1, len(episode_links)+1)]
+    opts = [a.get_text() for a in soup.find_all('a', class_="lEp epT divNumEp smallbox px-2 mx-1 text-left d-flex")]
     selected = menu(opts)
-    return int(selected) - 1, episode_links 
+    return  opts.index(selected), episode_links 
 
 def find_player_link(url_episode):
     print("Procurando video em:", url_episode)
@@ -73,31 +74,41 @@ def find_player_link(url_episode):
     driver.quit()
     return link
 
-def play_episode(link, idx):
+def play_episode(link):
     try:
         subprocess.run(["mpv", link])
     except:
         print("mpv não encontrado ou houveram problemas na sua execução.")
         exit()
 
-    opts = ["Proximo episodio"]
+def player_control(idx, total):
+    opts = []
+    if idx < total - 1:
+        opts.append("Próximo")
+    if idx > 0:
+        opts.append("Anterior")
+
     opt = menu(opts)
-    if opt == "Proximo episodio":
+    if opt == "Próximo":
         idx += 1
+        return idx
+    elif opt == "Anterior":
+        idx -= 1
         return idx
     else:
         return -1
 
 if __name__=="__main__":
     url_episodes = search_anime()
-    idx, episode_links = search_episode(url_episodes)
+    idx, episode_links = search_episodes(url_episodes)
+    num_episodes = len(episode_links)
     link = find_player_link(episode_links[idx])
-    idx = play_episode(link, idx)
-    
-    while idx != -1 and idx < len(episode_links):
-        link = find_player_link(episode_links[idx])
-        idx = play_episode(link, idx)
+    play_episode(link)
+    idx = player_control(idx, num_episodes)
 
-    if idx >= len(episode_links):
-        print("Sem mais episodios!")
+    while idx != -1 and idx < num_episodes:
+        link = find_player_link(episode_links[idx])
+        play_episode(link)
+        idx = player_control(idx, total)
+
     
