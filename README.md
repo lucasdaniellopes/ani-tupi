@@ -1,5 +1,5 @@
 # Sobre
-Estava cansado de anúncios e o ani-cli não tinha conteúdo em portuguẽs brasileiro então fiz isso.
+Estava cansado de anúncios e o ani-cli não tinha conteúdo em portuguẽs brasileiro então fiz essa ferramenta de CLI.
 Para ver mangás veja ![manga-tupi](https://github.com/manga-tupi)
 
 # Youtube Demo
