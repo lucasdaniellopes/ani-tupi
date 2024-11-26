@@ -30,7 +30,7 @@ def search_anime():
     soup = BeautifulSoup(html_content.text, 'html.parser')
     titles_link = [div.article.a["href"] for div in soup.find_all('div', class_='col-6 col-sm-4 col-md-3 col-lg-2 mb-1 minWDanime divCardUltimosEps') if 'title' in div.attrs]
     titles = [h3.get_text() for h3 in soup.find_all("h3", class_="animeTitle")]
-    selected = menu(titles)
+    selected = menu(titles, "Escolha o anime")
     url_episodes = titles_link[titles.index(selected)]
     return url_episodes
 
@@ -39,7 +39,7 @@ def search_episodes(url_episodes):
     soup = BeautifulSoup(html_episodes_page.text, "html.parser")
     episode_links = [a["href"] for a in soup.find_all('a', class_="lEp epT divNumEp smallbox px-2 mx-1 text-left d-flex")]
     opts = [a.get_text() for a in soup.find_all('a', class_="lEp epT divNumEp smallbox px-2 mx-1 text-left d-flex")]
-    selected = menu(opts)
+    selected = menu(opts, "Escolha o episódio")
     return  opts.index(selected), episode_links 
 
 def find_player_link(url_episode):
@@ -76,7 +76,13 @@ def find_player_link(url_episode):
 
 def play_episode(link):
     try:
-        subprocess.run(["mpv", link])
+        subprocess.Popen(
+                f"mpv {link} --fullscreen --cursor-autohide-fs-only",
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                shell=True
+                )
     except:
         print("mpv não encontrado ou houveram problemas na sua execução.")
         exit()
@@ -87,8 +93,8 @@ def player_control(idx, total):
         opts.append("Próximo")
     if idx > 0:
         opts.append("Anterior")
-
-    opt = menu(opts)
+    msg = "Aguarde o player..."
+    opt = menu(opts, msg)
     if opt == "Próximo":
         idx += 1
         return idx
