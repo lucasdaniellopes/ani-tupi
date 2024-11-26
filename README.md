@@ -1,6 +1,6 @@
 # Sobre
 Estava cansado de anúncios e o ani-cli não tinha conteúdo em portuguẽs brasileiro então fiz isso.
-Para ver mangás veja [![manga-tupi]](https://github.com/manga-tupi)
+Para ver mangás veja ![manga-tupi](https://github.com/manga-tupi)
 
 # Youtube Demo
 [![Demo](https://img.youtube.com/vi/eug6gKLTD3I/maxresdefault.jpg)](https://youtu.be/eug6gKLTD3I)
