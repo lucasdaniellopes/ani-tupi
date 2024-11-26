@@ -114,6 +114,6 @@ if __name__=="__main__":
     while idx != -1 and idx < num_episodes:
         link = find_player_link(episode_links[idx])
         play_episode(link)
-        idx = player_control(idx, total)
+        idx = player_control(idx, num_episodes)
 
     
