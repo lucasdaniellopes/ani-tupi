@@ -8,6 +8,13 @@ Para ver mangás veja ![manga-tupi](https://github.com/manga-tupi)
 # Requisitos
 mpv, firefox, python, venv e pip
 
+## Dependências no windows
+Recomendamos o uso do gerenciador de pacotes para windows [Cholatey](https://chocolatey.org/install).
+Para instalar o mpv no windows, execute o comando abaixo no powershell como administrador após instalar chocolatey.
+```powershell
+choco install mpvio.install
+```
+
 # Release
 Basta dar direito de execução a release mais atual e usar.
 ```bash
