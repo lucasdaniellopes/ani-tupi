@@ -1,5 +1,6 @@
 import requests
 import subprocess
+from threading import Thread
 from sys import exit
 from menu import menu
 from bs4 import BeautifulSoup
@@ -80,15 +81,14 @@ def find_player_link(url_episode):
 
 def play_episode(link):
     try:
-        process = subprocess.Popen(
-                f"mpv {link} --fullscreen --cursor-autohide-fs-only",
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                shell=True
-                )
-        if process.returncode != 0: 
-            raise Exception("mpv não encontrado ou houveram problemas na sua execução.")
+        process = subprocess.run(["mpv", link, "--fullscreen", "--cursor-autohide-fs-only"]
+                                 , stdout=subprocess.PIPE
+                                 , stdin=subprocess.PIPE)
+
+    except FileNotFoundError:
+        # Handle the case where mpv is not installed or not in PATH
+        print("Error: 'mpv' is not installed or not found in the system PATH.")
+        exit()
     except Exception as e:
         print(repr(e))
         exit()
@@ -99,8 +99,8 @@ def player_control(idx, total):
         opts.append("Próximo")
     if idx > 0:
         opts.append("Anterior")
-
-    msg = "Aguarde o player..."
+    
+    msg = "Menu"
     opt = menu(opts, msg)
     if opt == "Próximo":
         idx += 1
@@ -115,13 +115,15 @@ if __name__=="__main__":
     url_episodes = search_anime()
     idx, episode_links = search_episodes(url_episodes)
     num_episodes = len(episode_links)
-    link = find_player_link(episode_links[idx])
-    play_episode(link)
-    idx = player_control(idx, num_episodes)
 
-    while idx != -1 and idx < num_episodes:
+    def run(episode_links, idx):
         link = find_player_link(episode_links[idx])
         play_episode(link)
         idx = player_control(idx, num_episodes)
-
+        return idx
+    
+    idx = run(episode_links, idx)
+    while idx != -1 and idx < num_episodes:
+        idx = run(episode_links, idx)   
+        
     
