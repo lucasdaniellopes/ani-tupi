@@ -6,7 +6,7 @@ Para ver mangás veja ![manga-tupi](https://github.com/manga-tupi)
 [![Demo](https://img.youtube.com/vi/eug6gKLTD3I/maxresdefault.jpg)](https://youtu.be/eug6gKLTD3I)
 
 # Requisitos
-mpv, firefox, python, venv e pip
+mpv, firefox, python, venv, git
 
 ## Dependências no windows
 Recomendamos o uso do gerenciador de pacotes para windows [Cholatey](https://chocolatey.org/install).
@@ -24,16 +24,25 @@ chmod +x ./ani-tupi
 # Buildar do código-fonte
 Clone o repositório e execute os seguintes comandos.
 
+## Instalando python, pip e venv (Ubuntu)
+```
+sudo apt install python-is-python3 pip python3.12-venv
+```
+
 ## Linux
 ```bash
+git clone https://github.com/eduardonery1/ani-tupi
+cd ani-tupi
 python3 -m venv venv
 source ./venv/bin/activate
 pip3 install -r requirements.txt
 ./build.sh
 ```
 
-## Windows
+## Windows (Powershell)
 ```powershell
+git clone https://github.com/eduardonery1/ani-tupi
+cd ani-tupi
 python -m venv venv
 venv/Scripts/activate.ps1
 pip install -r requirements.txt
