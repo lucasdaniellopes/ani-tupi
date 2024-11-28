@@ -15,6 +15,6 @@ if __name__=="__main__":
     print(selected_anime)
     
     rep.search_episodes(selected_anime)
-    selected_episode = menu(rep.get_anime_titles())
-
+    selected_episode = menu(rep.get_episode_list(selected_anime))
     print(selected_episode)
+    

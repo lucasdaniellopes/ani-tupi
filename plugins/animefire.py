@@ -9,7 +9,7 @@ class AnimeFire(PluginInterface):
     name = "animefire"
     
     @staticmethod
-    def get_anime(query):
+    def search_anime(query):
         url = "https://animefire.plus/pesquisar/" + "-".join(query.split())
         html_content = requests.get(url)
         soup = BeautifulSoup(html_content.text, 'html.parser')
