@@ -3,6 +3,7 @@ import threading
 from menu import menu
 from repository import rep
 from loader import PluginInterface
+from video_player import play_video
 
 
 if __name__=="__main__":
@@ -16,5 +17,6 @@ if __name__=="__main__":
     
     rep.search_episodes(selected_anime)
     selected_episode = menu(rep.get_episode_list(selected_anime))
-    print(selected_episode)
     
+    player_url = rep.search_player(selected_anime, rep.get_episode_list(selected_anime).index(selected_episode) + 1)
+    play_video(player_url) 

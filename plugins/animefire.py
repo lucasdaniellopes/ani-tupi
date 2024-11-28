@@ -1,7 +1,26 @@
 import requests
+import subprocess
 from bs4 import BeautifulSoup
 from repository import rep
 from loader import PluginInterface
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+
+
+def is_firefox_installed_as_snap():
+    try:
+        result = subprocess.run(
+            ["snap", "list", "firefox"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        return result.returncode == 0  # Return code 0 means Firefox is installed as a snap
+    except FileNotFoundError:
+        return False
 
 
 class AnimeFire(PluginInterface):
@@ -17,20 +36,58 @@ class AnimeFire(PluginInterface):
         titles = [h3.get_text() for h3 in soup.find_all("h3", class_="animeTitle")]
 
         for title, url in zip(titles, titles_urls):
-            rep.add_anime(title, url, AnimeFire.get_episodes)
+            rep.add_anime(title, url, AnimeFire.search_episodes)
     
     @staticmethod
-    def get_episodes(anime, url):
+    def search_episodes(anime, url):
         html_episodes_page = requests.get(url)
         soup = BeautifulSoup(html_episodes_page.text, "html.parser")
         episode_links = [a["href"] for a in soup.find_all('a', class_="lEp epT divNumEp smallbox px-2 mx-1 text-left d-flex")]
         opts = [a.get_text() for a in soup.find_all('a', class_="lEp epT divNumEp smallbox px-2 mx-1 text-left d-flex")]
 
-        rep.add_episode_list(anime, opts, episode_links, AnimeFire.get_player_src) 
+        rep.add_episode_list(anime, opts, episode_links, AnimeFire.search_player_src) 
     
     @staticmethod
-    def get_player_src():
-        pass
+    def search_player_src(url_episode, container, event):
+        options = webdriver.FirefoxOptions()
+        options.add_argument("--headless")
+
+        try:
+            if is_firefox_installed_as_snap():
+                service = webdriver.FirefoxService(executable_path="/snap/bin/geckodriver")
+                driver = webdriver.Firefox(options=options, service = service)
+            else:
+                driver = webdriver.Firefox(options=options)
+        except:
+            event.wait()
+            raise Exception("Firefox not installed.")
+
+        driver.get(url_episode)
+        try:
+            params = (By.ID, "my-video_html5_api")
+            element = WebDriverWait(driver, 7).until(
+                EC.visibility_of_all_elements_located(params)
+            )
+        except:
+            try:
+                xpath = "/html/body/div[2]/div[2]/div/div[1]/div[1]/div/div/div[2]/div[4]/iframe"
+                params = (By.XPATH, xpath)
+                element = WebDriverWait(driver, 7).until(
+                    EC.visibility_of_all_elements_located(params)
+                )
+            except:
+                driver.quit()
+                event.wait()
+                raise Exception("nor iframe nor video tags were found in animefire.")
+
+        product = driver.find_element(params[0], params[1])
+        link = product.get_property("src") 
+
+        if not event.is_set():
+            container.append(link)
+            event.set()
+        else:
+            event.wait()
 
 
 def load(languages_dict):

@@ -5,7 +5,6 @@ from typing import Callable
 from collections import defaultdict
 from threading import Thread, Condition
 from concurrent.futures import ThreadPoolExecutor
-from playwright.async_api import async_playwright
 
 
 class Repository:
@@ -64,7 +63,7 @@ class Repository:
     def search_player(self, anime: str, episode_num: int) -> None:
         selected_urls = []
         for urls, F in self.anime_episodes_urls[anime]:
-            selected_urls.append(urls[episode_num - 1])
+            selected_urls.append((urls[episode_num - 1], F))
 
         async def search_all_sources():
             nonlocal selected_urls, self
@@ -72,7 +71,7 @@ class Repository:
             container = []
             loop = asyncio.get_running_loop()
             with self.thread_pool as executor:
-                tasks = [loop.run_in_executor(executor, F, url, container, event) for url in selected_urls]
+                tasks = [loop.run_in_executor(executor, F, url, container, event) for url, F in selected_urls]
                 done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED) 
 
                 for task in pending:
@@ -84,5 +83,5 @@ class Repository:
 rep = Repository()
 
 if __name__=="__main__":
-    rep2 = Repository()
-    print(rep is rep2)
+    rep3, rep2 = Repository(), Repository()
+    print(rep3 is rep2)
