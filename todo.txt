@@ -5,9 +5,7 @@ add watch lists
 study the playlist functionality
 TUI lib
 add manga-tupi
-think about how to introduce module level, inter component testing
 improve model with Cython
-ask next episode, prev 
 merge with main after creating & testing build script in ubuntu.
 
 user <-> TUI (view) <- controler (main) <->  model (repository) <- plugins (scrapers or api)

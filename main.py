@@ -28,10 +28,10 @@ if __name__=="__main__":
     episode_idx = episode_list.index(selected_episode) 
     while True:
         player_url = rep.search_player(selected_anime, episode_idx + 1)
+        if args.debug: print(player_url)
         play_video(player_url, args.debug)
 
         opts = []
-        print(episode_idx, len(episode_list) -1, episode_list)
         if episode_idx < len(episode_list) - 1:
             opts.append("Próximo")
         if episode_idx > 0:

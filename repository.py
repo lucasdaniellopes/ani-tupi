@@ -20,7 +20,6 @@ class Repository:
         self.anime_to_urls = defaultdict(list)
         self.anime_episodes_titles = defaultdict(list)
         self.anime_episodes_urls = defaultdict(list)
-        self.thread_pool = ThreadPoolExecutor(max_workers=cpu_count())
     
     def __new__(cls):
         if not Repository._instance:
@@ -78,7 +77,7 @@ class Repository:
             event = asyncio.Event()
             container = []
             loop = asyncio.get_running_loop()
-            with self.thread_pool as executor:
+            with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
                 tasks = [loop.run_in_executor(executor, F, url, container, event) for url, F in selected_urls]
                 done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED) 
 
