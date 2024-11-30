@@ -32,9 +32,9 @@ class AnimeFire(PluginInterface):
         url = "https://animefire.plus/pesquisar/" + "-".join(query.split())
         html_content = requests.get(url)
         soup = BeautifulSoup(html_content.text, 'html.parser')
-        titles_urls = [div.article.a["href"] for div in soup.find_all('div', class_='col-6 col-sm-4 col-md-3 col-lg-2 mb-1 minWDanime divCardUltimosEps') if 'title' in div.attrs]
+        target_class = 'col-6 col-sm-4 col-md-3 col-lg-2 mb-1 minWDanime divCardUltimosEps'
+        titles_urls = [div.article.a["href"] for div in soup.find_all('div', class_=target_class) if 'title' in div.attrs]
         titles = [h3.get_text() for h3 in soup.find_all("h3", class_="animeTitle")]
-
         for title, url in zip(titles, titles_urls):
             rep.add_anime(title, url, AnimeFire.search_episodes)
     
@@ -44,7 +44,6 @@ class AnimeFire(PluginInterface):
         soup = BeautifulSoup(html_episodes_page.text, "html.parser")
         episode_links = [a["href"] for a in soup.find_all('a', class_="lEp epT divNumEp smallbox px-2 mx-1 text-left d-flex")]
         opts = [a.get_text() for a in soup.find_all('a', class_="lEp epT divNumEp smallbox px-2 mx-1 text-left d-flex")]
-
         rep.add_episode_list(anime, opts, episode_links, AnimeFire.search_player_src) 
     
     @staticmethod
@@ -59,7 +58,6 @@ class AnimeFire(PluginInterface):
             else:
                 driver = webdriver.Firefox(options=options)
         except:
-            event.wait()
             raise Exception("Firefox not installed.")
 
         driver.get(url_episode)
@@ -77,7 +75,6 @@ class AnimeFire(PluginInterface):
                 )
             except:
                 driver.quit()
-                event.wait()
                 raise Exception("nor iframe nor video tags were found in animefire.")
 
         product = driver.find_element(params[0], params[1])
@@ -86,8 +83,6 @@ class AnimeFire(PluginInterface):
         if not event.is_set():
             container.append(link)
             event.set()
-        else:
-            event.wait()
 
 
 def load(languages_dict):

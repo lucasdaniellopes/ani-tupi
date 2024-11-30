@@ -35,6 +35,11 @@ class Repository:
             source.search_anime(query)
     
     def add_anime(self, title: str, url: str, F: Callable[[str, str], None]) -> None:
+        """
+        This method assumes that different seasons are different anime, like MAL, so plugin devs should take scrape that way.
+        TODO: create algorithm to consider the different anime titles for the same anime in each website as one. 
+        """
+        
         self.anime_to_urls[title].append((url, F))
 
     def get_anime_titles(self) -> list[str]:
@@ -61,6 +66,9 @@ class Repository:
         return self.anime_episodes_titles[anime][0]
 
     def search_player(self, anime: str, episode_num: int) -> None:
+        """
+        This method assumes all episode lists to be the same size, plugin devs should guarantee that OVA's are not considered.
+        """
         selected_urls = []
         for urls, F in self.anime_episodes_urls[anime]:
             selected_urls.append((urls[episode_num - 1], F))
