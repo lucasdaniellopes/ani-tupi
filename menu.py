@@ -4,7 +4,6 @@ from sys import exit
 
 def __menu(stdscr, menu, msg, result) -> str:
     menu.append("Sair")
-
     stdscr.clear()
     curses.curs_set(0)  
 
@@ -29,7 +28,6 @@ def __menu(stdscr, menu, msg, result) -> str:
     
         end_index = start_index + display_height
         visible_options = menu[start_index:end_index] 
-        
         # Display menu
         for idx, row in enumerate(visible_options):
             if start_index + idx == current_option:
@@ -61,6 +59,7 @@ def menu(opts: list[str], msg="") -> str:
     curses.wrapper(lambda stdscr: __menu(stdscr, opts, msg, result=selected))
     if selected[0] == "Sair":
         exit()
+    opts.pop()
     return selected[0]
 
 if __name__ == "__main__":

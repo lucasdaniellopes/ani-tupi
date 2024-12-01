@@ -1,129 +1,45 @@
-import requests
-import subprocess
-from threading import Thread
-from sys import exit
+import loader
+import argparse
 from menu import menu
-from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+from repository import rep
+from loader import PluginInterface
+from video_player import play_video
 
-
-def is_firefox_installed_as_snap():
-    try:
-        result = subprocess.run(
-            ["snap", "list", "firefox"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
-        )
-        return result.returncode == 0  # Return code 0 means Firefox is installed as a snap
-    except FileNotFoundError:
-        return False
-
-def search_anime():
-    url = "https://animefire.plus/pesquisar/" + "-".join(input("Pesquisar anime: ").split())
-    print("Buscando...")
-    html_content = requests.get(url)
-    soup = BeautifulSoup(html_content.text, 'html.parser')
-    titles_link = [div.article.a["href"] for div in soup.find_all('div', class_='col-6 col-sm-4 col-md-3 col-lg-2 mb-1 minWDanime divCardUltimosEps') if 'title' in div.attrs]
-    titles = [h3.get_text() for h3 in soup.find_all("h3", class_="animeTitle")]
-    selected = menu(titles, "Escolha o anime")
-    url_episodes = titles_link[titles.index(selected)]
-    return url_episodes
-
-def search_episodes(url_episodes):
-    html_episodes_page = requests.get(url_episodes)
-    soup = BeautifulSoup(html_episodes_page.text, "html.parser")
-    episode_links = [a["href"] for a in soup.find_all('a', class_="lEp epT divNumEp smallbox px-2 mx-1 text-left d-flex")]
-    opts = [a.get_text() for a in soup.find_all('a', class_="lEp epT divNumEp smallbox px-2 mx-1 text-left d-flex")]
-    selected = menu(opts, "Escolha o episódio")
-    return  opts.index(selected), episode_links 
-
-def find_player_link(url_episode):
-    print("Procurando video em:", url_episode)
-    options = webdriver.FirefoxOptions()
-    options.add_argument("--headless")
-
-    try:
-        if is_firefox_installed_as_snap():
-            service = webdriver.FirefoxService(executable_path="/snap/bin/geckodriver")
-            driver = webdriver.Firefox(options=options, service = service)
-        else:
-            driver = webdriver.Firefox(options=options)
-    except:
-        print("Firefox não encontrado.")
-        exit()
-
-    driver.get(url_episode)
-
-    try:
-        params = (By.ID, "my-video_html5_api")
-        element = WebDriverWait(driver, 7).until(
-            EC.visibility_of_all_elements_located(params)
-        )
-    except:
-        try:
-            params = (By.XPATH, "/html/body/div[2]/div[2]/div/div[1]/div[1]/div/div/div[2]/div[4]/iframe")
-            element = WebDriverWait(driver, 7).until(
-                EC.visibility_of_all_elements_located(params)
-            )
-        except:
-            print("AnimeFire não tem mais esse video ou foi hospedado no YouTube.")
-            driver.quit()
-            exit()
-
-    product = driver.find_element(params[0], params[1])
-    link = product.get_property("src")
-    driver.quit()
-    return link
-
-def play_episode(link):
-    try:
-        process = subprocess.run(["mpv", link, "--fullscreen", "--cursor-autohide-fs-only"]
-                                 , stdout=subprocess.PIPE
-                                 , stdin=subprocess.PIPE)
-
-    except FileNotFoundError:
-        # Handle the case where mpv is not installed or not in PATH
-        print("Error: 'mpv' is not installed or not found in the system PATH.")
-        exit()
-    except Exception as e:
-        print(repr(e))
-        exit()
-
-def player_control(idx, total):
-    opts = []
-    if idx < total - 1:
-        opts.append("Próximo")
-    if idx > 0:
-        opts.append("Anterior")
-    
-    msg = "Menu"
-    opt = menu(opts, msg)
-    if opt == "Próximo":
-        idx += 1
-        return idx
-    elif opt == "Anterior":
-        idx -= 1
-        return idx
-    else:
-        return -1
 
 if __name__=="__main__":
-    url_episodes = search_anime()
-    idx, episode_links = search_episodes(url_episodes)
-    num_episodes = len(episode_links)
+    parser = argparse.ArgumentParser(
+                prog = "ani-tupi",
+                description="Veja anime sem sair do terminal."
+            )
+    parser.add_argument("--query", "-q")
+    parser.add_argument("--debug", "-d", action="store_true")
+    args = parser.parse_args()
 
-    def run(episode_links, idx):
-        link = find_player_link(episode_links[idx])
-        play_episode(link)
-        idx = player_control(idx, num_episodes)
-        return idx
+    loader.load_plugins(["animefire"], {"pt-br"})
     
-    idx = run(episode_links, idx)
-    while idx != -1 and idx < num_episodes:
-        idx = run(episode_links, idx)   
-        
+    query = (input("Pesquise anime: ") if not args.query else args.query) if not args.debug else "eva"
     
+    rep.search_anime(query)
+    selected_anime = menu(rep.get_anime_titles(), msg="Escolha o Anime.")
+    
+    rep.search_episodes(selected_anime)
+    episode_list = rep.get_episode_list(selected_anime)
+    selected_episode = menu(episode_list, msg="Escolha o episódio.")
+    episode_idx = episode_list.index(selected_episode) 
+    while True:
+        player_url = rep.search_player(selected_anime, episode_idx + 1)
+        if args.debug: print(player_url)
+        play_video(player_url, args.debug)
+
+        opts = []
+        if episode_idx < len(episode_list) - 1:
+            opts.append("Próximo")
+        if episode_idx > 0:
+            opts.append("Anterior")
+
+        selected_opt = menu(opts, msg="O que quer fazer agora?")
+
+        if selected_opt == "Próximo":
+            episode_idx += 1 
+        elif selected_opt == "Anterior":
+            episode_idx -= 1

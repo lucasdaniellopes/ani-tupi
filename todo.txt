@@ -1,7 +1,15 @@
 create algorithm to remember which anime i watched and where I stopped
-skip openings
-skip preview
-simulcast
-download
 take from more websites in case animefire dosen't work
+scraper plugins parameters should also be by xpath
+add watch lists
+study the playlist functionality
+TUI lib
+add manga-tupi
+improve model with Cython
+merge with main after creating & testing build script in ubuntu.
+
+user <-> TUI (view) <- controler (main) <->  model (repository) <- plugins (scrapers or api)
+(MVCP)
+
+
 
