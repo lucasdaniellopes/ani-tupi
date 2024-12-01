@@ -18,7 +18,7 @@ if __name__=="__main__":
     loader.load_plugins(["animefire"], {"pt-br"})
     
     query = (input("Pesquise anime: ") if not args.query else args.query) if not args.debug else "eva"
-
+    
     rep.search_anime(query)
     selected_anime = menu(rep.get_anime_titles(), msg="Escolha o Anime.")
     
@@ -43,6 +43,3 @@ if __name__=="__main__":
             episode_idx += 1 
         elif selected_opt == "Anterior":
             episode_idx -= 1
-
-
-
