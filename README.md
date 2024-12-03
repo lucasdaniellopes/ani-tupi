@@ -47,7 +47,7 @@ python -m venv venv
 venv/Scripts/activate.ps1
 pip install -r requirements.txt
 pip install windows-curses
-pyinstaller --onefile main.py -n ani-tupi
+pyinstaller --onefile main.py -n ani-tupi --hidden-import plugins/animefire.py
 ```
 Depois, adicione o diretório dist que foi gerado pelo pyinstaller a variável de sistema PATH. Reinicie seu terminal. 
 
