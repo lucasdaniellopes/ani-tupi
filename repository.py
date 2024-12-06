@@ -6,14 +6,15 @@ from collections import defaultdict
 from threading import Thread, Condition
 from concurrent.futures import ThreadPoolExecutor
 from multiprocessing.pool import ThreadPool
-
+from fuzzywuzzy import fuzz
 
 class Repository:
     """ SingletonRepository 
         get for methods called by main that return some value
         search for methods called by main that don't return but affects state
         add for methods called by any plugin that affects state
-        register should be called by a loader function """
+        register should be called by a loader function 
+    """
 
     _instance = None
     
@@ -39,13 +40,28 @@ class Repository:
     def add_anime(self, title: str, url: str, F: Callable[[str, str], None], params=None) -> None:
         """
         This method assumes that different seasons are different anime, like MAL, so plugin devs should take scrape that way.
-        TODO: create algorithm to consider the different anime titles for the same anime in each website as one. 
         """
-        
-        self.anime_to_urls[title].append((url, F, params))
+        title_ = title.lower()
+        table = {"clássico": "", 
+                 "classico":"", 
+                 ":":"", 
+                 "part":"season", 
+                 "temporada":"season",
+                 "(":"",
+                 ")":"" }
+
+        for key, val in table.items():
+            title_ = title_.replace(key, val)
+
+        threshold = 30
+        for key in self.anime_to_urls.keys():
+            if fuzz.ratio(title_, key) <= threshold:
+                self.anime_to_urls[key].append((url, F, params))
+                return
+        self.anime_to_urls[title_].append((url, F, params))
 
     def get_anime_titles(self) -> list[str]:
-        return list(self.anime_to_urls.keys())
+        return sorted([s.capitalize() for s in self.anime_to_urls.keys()])
     
     def search_episodes(self, anime: str) -> list[str]:
         if anime in self.anime_episodes_titles:

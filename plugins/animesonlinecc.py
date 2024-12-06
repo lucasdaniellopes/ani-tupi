@@ -12,7 +12,6 @@ from os import cpu_count
 from .utils import is_firefox_installed_as_snap
 
 
-
 class AnimesOnlineCC(PluginInterface):
     languages = ["pt-br"]
     name = "animesonlinecc"
@@ -34,7 +33,7 @@ class AnimesOnlineCC(PluginInterface):
                 num_seasons = len([div for div in soup.find_all('div', class_='se-c')])
                 if num_seasons > 1:
                     for n in range(2, num_seasons + 1):
-                        rep.add_anime(title + " Temporada " + str(n), url, AnimesOnlineCC.search_episodes, n)
+                        rep.add_anime(title + " Season " + str(n), url, AnimesOnlineCC.search_episodes, n)
         
         with ThreadPool(cpu_count()) as pool:
             for title, url in zip(titles, titles_urls):
