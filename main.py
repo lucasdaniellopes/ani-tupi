@@ -15,7 +15,7 @@ if __name__=="__main__":
     parser.add_argument("--debug", "-d", action="store_true")
     args = parser.parse_args()
 
-    loader.load_plugins(["animefire"], {"pt-br"})
+    loader.load_plugins({"pt-br"}, None if not args.debug else ["animesonlinecc"])
     
     query = (input("Pesquise anime: ") if not args.query else args.query) if not args.debug else "eva"
     
@@ -26,6 +26,7 @@ if __name__=="__main__":
     episode_list = rep.get_episode_list(selected_anime)
     selected_episode = menu(episode_list, msg="Escolha o episódio.")
     episode_idx = episode_list.index(selected_episode) 
+
     while True:
         player_url = rep.search_player(selected_anime, episode_idx + 1)
         if args.debug: print(player_url)

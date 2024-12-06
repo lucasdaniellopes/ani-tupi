@@ -5,10 +5,12 @@ from typing import Callable
 from collections import defaultdict
 from threading import Thread, Condition
 from concurrent.futures import ThreadPoolExecutor
+from multiprocessing.pool import ThreadPool
 
 
 class Repository:
-    """ get for methods called by main that return some value
+    """ SingletonRepository 
+        get for methods called by main that return some value
         search for methods called by main that don't return but affects state
         add for methods called by any plugin that affects state
         register should be called by a loader function """
@@ -30,16 +32,17 @@ class Repository:
         self.sources.append(plugin)
     
     def search_anime(self, query: str) -> None:
-        for source in rep.sources:
-            source.search_anime(query)
-    
-    def add_anime(self, title: str, url: str, F: Callable[[str, str], None]) -> None:
+        with ThreadPool(min(len(self.sources), cpu_count())) as pool:
+            for source in self.sources:
+                pool.apply(source.search_anime, args=(query,))
+
+    def add_anime(self, title: str, url: str, F: Callable[[str, str], None], params=None) -> None:
         """
         This method assumes that different seasons are different anime, like MAL, so plugin devs should take scrape that way.
         TODO: create algorithm to consider the different anime titles for the same anime in each website as one. 
         """
         
-        self.anime_to_urls[title].append((url, F))
+        self.anime_to_urls[title].append((url, F, params))
 
     def get_anime_titles(self) -> list[str]:
         return list(self.anime_to_urls.keys())
@@ -49,7 +52,7 @@ class Repository:
             return self.anime_episode_titles[anime]
 
         urls_and_scrapers = rep.anime_to_urls[anime]
-        threads = [Thread(target=F, args=(anime, url,)) for url, F in urls_and_scrapers]
+        threads = [Thread(target=search_episode, args=(anime, url, params, )) for url, search_episode, params in urls_and_scrapers]
         
         for th in threads:
             th.start()
@@ -78,7 +81,7 @@ class Repository:
             container = []
             loop = asyncio.get_running_loop()
             with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
-                tasks = [loop.run_in_executor(executor, F, url, container, event) for url, F in selected_urls]
+                tasks = [loop.run_in_executor(executor, search_player_src, url, container, event) for url, search_player_src in selected_urls]
                 done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED) 
 
                 for task in pending:

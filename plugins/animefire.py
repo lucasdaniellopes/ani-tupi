@@ -7,20 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
-
-
-def is_firefox_installed_as_snap():
-    try:
-        result = subprocess.run(
-            ["snap", "list", "firefox"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
-        )
-        return result.returncode == 0  # Return code 0 means Firefox is installed as a snap
-    except FileNotFoundError:
-        return False
+from .utils import is_firefox_installed_as_snap
 
 
 class AnimeFire(PluginInterface):
@@ -39,7 +26,7 @@ class AnimeFire(PluginInterface):
             rep.add_anime(title, url, AnimeFire.search_episodes)
     
     @staticmethod
-    def search_episodes(anime, url):
+    def search_episodes(anime, url, params):
         html_episodes_page = requests.get(url)
         soup = BeautifulSoup(html_episodes_page.text, "html.parser")
         episode_links = [a["href"] for a in soup.find_all('a', class_="lEp epT divNumEp smallbox px-2 mx-1 text-left d-flex")]

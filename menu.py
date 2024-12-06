@@ -27,7 +27,7 @@ def __menu(stdscr, menu, msg, result) -> str:
         stdscr.attroff(curses.color_pair(2))
     
         end_index = start_index + display_height
-        visible_options = menu[start_index:end_index] 
+        visible_options = menu[start_index:min(len(menu), end_index)] 
         # Display menu
         for idx, row in enumerate(visible_options):
             if start_index + idx == current_option:
