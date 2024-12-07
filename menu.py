@@ -15,7 +15,6 @@ def __menu(stdscr, menu, msg, result) -> str:
     curses.init_pair(1, curses.COLOR_BLACK, curses.COLOR_YELLOW)  # Black text on yellow background
     curses.init_pair(2, curses.COLOR_YELLOW, curses.COLOR_BLACK)
 
-
     current_option = 0
     start_index = 0  # Index of the first displayed option
 

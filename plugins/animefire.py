@@ -23,7 +23,7 @@ class AnimeFire(PluginInterface):
         titles_urls = [div.article.a["href"] for div in soup.find_all('div', class_=target_class) if 'title' in div.attrs]
         titles = [h3.get_text() for h3 in soup.find_all("h3", class_="animeTitle")]
         for title, url in zip(titles, titles_urls):
-            rep.add_anime(title, url, AnimeFire.search_episodes)
+            rep.add_anime(title, url, AnimeFire.name)
     
     @staticmethod
     def search_episodes(anime, url, params):
@@ -31,7 +31,7 @@ class AnimeFire(PluginInterface):
         soup = BeautifulSoup(html_episodes_page.text, "html.parser")
         episode_links = [a["href"] for a in soup.find_all('a', class_="lEp epT divNumEp smallbox px-2 mx-1 text-left d-flex")]
         opts = [a.get_text() for a in soup.find_all('a', class_="lEp epT divNumEp smallbox px-2 mx-1 text-left d-flex")]
-        rep.add_episode_list(anime, opts, episode_links, AnimeFire.search_player_src) 
+        rep.add_episode_list(anime, opts, episode_links, AnimeFire.name) 
     
     @staticmethod
     def search_player_src(url_episode, container, event):

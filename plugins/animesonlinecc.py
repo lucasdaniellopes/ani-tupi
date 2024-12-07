@@ -25,7 +25,7 @@ class AnimesOnlineCC(PluginInterface):
         titles_urls = [div.h3.a["href"] for div in divs]
         titles = [div.h3.a.get_text() for div in divs]
         for title, url in zip(titles, titles_urls):
-            rep.add_anime(title, url, AnimesOnlineCC.search_episodes)
+            rep.add_anime(title, url, AnimesOnlineCC.name)
 
         def parse_seasons(title, url):
                 html = requests.get(url)
@@ -33,14 +33,12 @@ class AnimesOnlineCC(PluginInterface):
                 num_seasons = len([div for div in soup.find_all('div', class_='se-c')])
                 if num_seasons > 1:
                     for n in range(2, num_seasons + 1):
-                        rep.add_anime(title + " Season " + str(n), url, AnimesOnlineCC.search_episodes, n)
+                        rep.add_anime(title + " Season " + str(n), url, AnimesOnlineCC.name, n)
         
         with ThreadPool(cpu_count()) as pool:
             for title, url in zip(titles, titles_urls):
                 pool.apply(parse_seasons, args=(title, url))
             
-
-    
     @staticmethod
     def search_episodes(anime, url, season):
         html_episodes_page = requests.get(url)
@@ -51,7 +49,7 @@ class AnimesOnlineCC(PluginInterface):
         for div in season.find_all('div', class_="episodiotitle"):
             urls.append(div.a["href"])
             titles.append(div.a.get_text()) 
-        rep.add_episode_list(anime, titles, urls, AnimesOnlineCC.search_player_src) 
+        rep.add_episode_list(anime, titles, urls, AnimesOnlineCC.name)
     
     @staticmethod
     def search_player_src(url_episode, container, event):
