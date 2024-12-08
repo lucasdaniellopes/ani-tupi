@@ -66,6 +66,7 @@ class AnimeFire(PluginInterface):
 
         product = driver.find_element(params[0], params[1])
         link = product.get_property("src") 
+        driver.quit()
 
         if not event.is_set():
             container.append(link)

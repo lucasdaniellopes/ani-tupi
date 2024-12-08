@@ -7,31 +7,39 @@ from video_player import play_video
 from json import load, dump
 
 
-def history():
-    with open("history.json", "r+") as f:
-        data = load(f)
-        titles = dict()
-        for entry, info in data.items():
-            ep_info = f" (Episódio {info[1]})"
-            titles[entry + ep_info] = len(ep_info)
-        selected = menu(list(titles.keys()), msg="Continue assistindo.")
-        anime = selected[:-titles[selected]]
-        episode = data[anime][1]
-        rep.anime_episodes_urls[anime] = data[anime][0]
-        del data[anime]
-        dump(data, f)
-    return anime, episode
+def load_history():
+    try:
+        with open("history.json", "r") as f:
+            data = load(f)
+            titles = dict()
+            for entry, info in data.items():
+                ep_info = f" (Ultimo episódio assistido {info[1] + 1})"
+                titles[entry + ep_info] = len(ep_info)
+            selected = menu(list(titles.keys()), msg="Continue assistindo.")
+            anime = selected[:-titles[selected]]
+            episode_idx = data[anime][1]
+            rep.anime_episodes_urls[anime] = data[anime][0]
+        return anime, episode_idx
+    except FileNotFoundError:
+        raise Exception("Sem histórico de animes")
+
 
 def save_history(anime, episode):
-    with open("history.json", "w+") as f:
-        try:
+    try:
+        with open("history.json", "r+") as f:
             data = load(f)
-        except:
-            data = dict()
+            data[anime] = [rep.anime_episodes_urls[anime],
+                           episode]
+        with open("history.json", "w") as f:
+            dump(data, f)
 
-        data[anime] = [rep.anime_episodes_urls[anime],
-                       episode]
-        dump(data, f)
+    except FileNotFoundError:
+        with open("history.json", "w") as f:
+            data = dict()
+            data[anime] = [rep.anime_episodes_urls[anime],
+                            episode]
+            dump(data, f)
+
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(
@@ -57,7 +65,7 @@ if __name__=="__main__":
 
         episode_idx = episode_list.index(selected_episode) 
     else:
-        selected_anime, episode_idx = history()
+        selected_anime, episode_idx = load_history()
     
     num_episodes = len(rep.anime_episodes_urls[selected_anime][0][0])
     while True:
@@ -65,7 +73,7 @@ if __name__=="__main__":
         player_url = rep.search_player(selected_anime, episode)
         if args.debug: print(player_url)
         play_video(player_url, args.debug)
-        save_history(selected_anime, episode)
+        save_history(selected_anime, episode_idx)
 
         opts = []
         if episode_idx < num_episodes - 1:

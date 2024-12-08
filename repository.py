@@ -105,8 +105,8 @@ class Repository:
                 tasks = [loop.run_in_executor(executor, self.sources[source].search_player_src, url, container, event) for url, source in selected_urls]
                 done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED) 
 
-                for task in pending:
-                    task.cancel()
+                #for task in pending:
+                #    task.cancel()
                 return container[0]
 
         return asyncio.run(search_all_sources())
