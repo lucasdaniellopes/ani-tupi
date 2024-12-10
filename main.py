@@ -5,54 +5,16 @@ from repository import rep
 from loader import PluginInterface
 from video_player import play_video
 from json import load, dump
+from manga_tupi import main as manga_tupi
+from os import name
+from pathlib import Path
 
 
-def load_history():
-    try:
-        with open("history.json", "r") as f:
-            data = load(f)
-            titles = dict()
-            for entry, info in data.items():
-                ep_info = f" (Ultimo episódio assistido {info[1] + 1})"
-                titles[entry + ep_info] = len(ep_info)
-            selected = menu(list(titles.keys()), msg="Continue assistindo.")
-            anime = selected[:-titles[selected]]
-            episode_idx = data[anime][1]
-            rep.anime_episodes_urls[anime] = data[anime][0]
-        return anime, episode_idx
-    except FileNotFoundError:
-        raise Exception("Sem histórico de animes")
+HISTORY_PATH = Path.home().as_posix() + "/.local/state/ani-tupi/" if name != 'nt' else "C:\\Program Files\\ani-tupi\\"
 
-
-def save_history(anime, episode):
-    try:
-        with open("history.json", "r+") as f:
-            data = load(f)
-            data[anime] = [rep.anime_episodes_urls[anime],
-                           episode]
-        with open("history.json", "w") as f:
-            dump(data, f)
-
-    except FileNotFoundError:
-        with open("history.json", "w") as f:
-            data = dict()
-            data[anime] = [rep.anime_episodes_urls[anime],
-                            episode]
-            dump(data, f)
-
-
-if __name__=="__main__":
-    parser = argparse.ArgumentParser(
-                prog = "ani-tupi",
-                description="Veja anime sem sair do terminal."
-            )
-    parser.add_argument("--query", "-q")
-    parser.add_argument("--debug", "-d", action="store_true")
-    parser.add_argument("--continue_watching", "-c", action="store_true")
-    args = parser.parse_args()
-
+def main(args):
     loader.load_plugins({"pt-br"}, None if not args.debug else ["animesonlinecc"])
-    
+
     if not args.continue_watching:
         query = (input("Pesquise anime: ") if not args.query else args.query) if not args.debug else "eva"
         rep.search_anime(query)
@@ -87,3 +49,58 @@ if __name__=="__main__":
             episode_idx += 1 
         elif selected_opt == "Anterior":
             episode_idx -= 1
+
+def load_history():
+    file_path = HISTORY_PATH + "history.json"
+    try:
+        with open(file_path, "r") as f:
+            data = load(f)
+            titles = dict()
+            for entry, info in data.items():
+                ep_info = f" (Ultimo episódio assistido {info[1] + 1})"
+                titles[entry + ep_info] = len(ep_info)
+            selected = menu(list(titles.keys()), msg="Continue assistindo.")
+            anime = selected[:-titles[selected]]
+            episode_idx = data[anime][1]
+            rep.anime_episodes_urls[anime] = data[anime][0]
+        return anime, episode_idx
+    except FileNotFoundError:
+        raise Exception("Sem histórico de animes")
+
+
+def save_history(anime, episode):
+    file_path = HISTORY_PATH + "history.json"
+    try:
+        with open(file_path, "r+") as f:
+            data = load(f)
+            data[anime] = [rep.anime_episodes_urls[anime],
+                           episode]
+        with open(file_path , "w") as f:
+            dump(data, f)
+
+    except FileNotFoundError:
+        Path(file_path).mkdir(parents=True, exist_ok=True)
+        with open(file_path, "w") as f:
+            data = dict()
+            data[anime] = [rep.anime_episodes_urls[anime],
+                            episode]
+            dump(data, f)
+
+
+if __name__=="__main__":
+    parser = argparse.ArgumentParser(
+                prog = "ani-tupi",
+                description="Veja anime sem sair do terminal."
+            )
+    parser.add_argument("--query", "-q")
+    parser.add_argument("--debug", "-d", action="store_true")
+    parser.add_argument("--continue_watching", "-c", action="store_true")
+    parser.add_argument("--manga", "-m", action="store_true")
+    args = parser.parse_args()
+
+    if args.manga:
+        manga_tupi()
+    else:
+        main(args)
+
+     

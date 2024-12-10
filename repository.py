@@ -93,8 +93,9 @@ class Repository:
         This method assumes all episode lists to be the same size, plugin devs should guarantee that OVA's are not considered.
         """
         selected_urls = []
-        for urls, F in self.anime_episodes_urls[anime]:
-            selected_urls.append((urls[episode_num - 1], F))
+        for urls, source in self.anime_episodes_urls[anime]:
+            if len(urls) >= episode_num:
+                selected_urls.append((urls[episode_num - 1], source))
 
         async def search_all_sources():
             nonlocal selected_urls, self
