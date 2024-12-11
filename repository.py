@@ -86,7 +86,7 @@ class Repository:
         self.anime_episodes_urls[anime].append((url_list, source))
     
     def get_episode_list(self, anime: str):
-        return self.anime_episodes_titles[anime][0]
+        return sorted(self.anime_episodes_titles[anime], key=lambda title_list: len(title_list))[0]
 
     def search_player(self, anime: str, episode_num: int) -> None:
         """

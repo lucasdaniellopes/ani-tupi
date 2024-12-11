@@ -12,4 +12,4 @@ PLUGIN_CP="cp -r plugins dist"
 echo "${PLUGIN_CP}"
 $PLUGIN_CP
 
-echo "PATH=$PATH:$(pwd)/dist" > ~/.bashrc
+echo PATH=$PATH:$(pwd)/dist >> ~/.bashrc

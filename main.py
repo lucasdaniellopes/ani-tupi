@@ -65,8 +65,8 @@ def load_history():
             rep.anime_episodes_urls[anime] = data[anime][0]
         return anime, episode_idx
     except FileNotFoundError:
-        raise Exception("Sem histórico de animes")
-
+        print("Sem histórico de animes")
+        raise
 
 def save_history(anime, episode):
     file_path = HISTORY_PATH + "history.json"
@@ -90,14 +90,14 @@ def save_history(anime, episode):
 if __name__=="__main__":
     parser = argparse.ArgumentParser(
                 prog = "ani-tupi",
-                description="Veja anime sem sair do terminal."
+                description="Veja anime sem sair do terminal.",
             )
-    parser.add_argument("--query", "-q")
+    parser.add_argument("--query", "-q",)
     parser.add_argument("--debug", "-d", action="store_true")
     parser.add_argument("--continue_watching", "-c", action="store_true")
     parser.add_argument("--manga", "-m", action="store_true")
     args = parser.parse_args()
-
+    
     if args.manga:
         manga_tupi()
     else:
