@@ -80,11 +80,7 @@ def save_history(anime, episode):
             dump(data, f)
 
     except FileNotFoundError:
-        try:
-            Path(file_path).mkdir(parents=True, exist_ok=True)
-        except IOError:
-            print("Não há permissão para criar os diretórios.")
-            return
+        Path(file_path).mkdir(parents=True, exist_ok=True)
 
         with open(file_path, "w") as f:
             data = dict()
@@ -92,6 +88,9 @@ def save_history(anime, episode):
                             episode]
             dump(data, f)
 
+    except PermissionError:
+        print("Não há permissão para criar os diretórios.")
+        return
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(
