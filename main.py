@@ -68,6 +68,9 @@ def load_history():
     except FileNotFoundError:
         print("Sem histórico de animes")
         exit()
+    except PermissionError:
+        print("Sem permissão para ler arquivos.")
+        return
 
 def save_history(anime, episode):
     file_path = HISTORY_PATH + "history.json"
@@ -89,7 +92,7 @@ def save_history(anime, episode):
             dump(data, f)
 
     except PermissionError:
-        print("Não há permissão para criar os diretórios.")
+        print("Não há permissão para criar arquivos.")
         return
 
 if __name__=="__main__":
