@@ -3,6 +3,7 @@ import argparse
 from menu import menu
 from repository import rep
 from loader import PluginInterface
+from sys import exit
 from video_player import play_video
 from json import load, dump
 from manga_tupi import main as manga_tupi
@@ -66,7 +67,7 @@ def load_history():
         return anime, episode_idx
     except FileNotFoundError:
         print("Sem histórico de animes")
-        raise
+        exit()
 
 def save_history(anime, episode):
     file_path = HISTORY_PATH + "history.json"
@@ -79,7 +80,12 @@ def save_history(anime, episode):
             dump(data, f)
 
     except FileNotFoundError:
-        Path(file_path).mkdir(parents=True, exist_ok=True)
+        try:
+            Path(file_path).mkdir(parents=True, exist_ok=True)
+        except IOError:
+            print("Não há permissão para criar os diretórios.")
+            return
+
         with open(file_path, "w") as f:
             data = dict()
             data[anime] = [rep.anime_episodes_urls[anime],
