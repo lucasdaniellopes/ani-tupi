@@ -15,6 +15,7 @@ from .utils import is_firefox_installed_as_snap
 class AnimesOnlineCC(PluginInterface):
     languages = ["pt-br"]
     name = "animesonlinecc"
+    quality = 480
     
     @staticmethod
     def search_anime(query):
@@ -78,7 +79,10 @@ class AnimesOnlineCC(PluginInterface):
             raise Exception("nor iframe nor video tags were found in animesonlinecc.")
 
         product = driver.find_element(params[0], params[1])
-        link = product.get_property("src") 
+        link = product.get_property("src")
+        
+        if "/sd/" in link:
+            link = link.replace("/sd/", "/hd/")
         driver.quit()
 
         if not event.is_set():

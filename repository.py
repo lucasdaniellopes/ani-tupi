@@ -43,6 +43,11 @@ class Repository:
         """
         This method assumes that different seasons are different anime, like MAL, so plugin devs should take scrape that way.
         """
+        # Adicionar tag de qualidade ao título
+        quality = getattr(self.sources.get(source), 'quality', None)
+        if quality:
+            title = f"{title} [{quality}p]"
+        
         title_ = title.lower()
         table = {"clássico": "", 
                  "classico": "", 
@@ -50,16 +55,18 @@ class Repository:
                  "part":"season", 
                  "temporada":"season",
                  "(":"",
-                 ")":"",
-                 " ": ""}
+                 ")":""}
 
         for key, val in table.items():
             title_ = title_.replace(key, val)
         
         self.norm_titles[title] = title_
 
-        threshold = 95
+        threshold = 98
         for key in self.anime_to_urls.keys():
+            # Não agrupar se um tem "Dublado" e outro não
+            if ("dublado" in title.lower()) != ("dublado" in key.lower()):
+                continue
             if fuzz.ratio(title_, self.norm_titles[key]) >= threshold:
                 self.anime_to_urls[key].append((url, source, params))
                 return
@@ -96,6 +103,9 @@ class Repository:
         for urls, source in self.anime_episodes_urls[anime]:
             if len(urls) >= episode_num:
                 selected_urls.append((urls[episode_num - 1], source))
+        
+        # Ordenar por qualidade (maior primeiro)
+        selected_urls.sort(key=lambda x: getattr(self.sources[x[1]], 'quality', 0), reverse=True)
 
         async def search_all_sources():
             nonlocal selected_urls, self

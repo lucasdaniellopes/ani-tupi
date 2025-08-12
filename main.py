@@ -14,7 +14,7 @@ from pathlib import Path
 HISTORY_PATH = Path.home().as_posix() + "/.local/state/ani-tupi/" if name != 'nt' else "C:\\Program Files\\ani-tupi\\"
 
 def main(args):
-    loader.load_plugins({"pt-br"}, None if not args.debug else ["animesonlinecc"])
+    loader.load_plugins({"pt-br"})
 
     if not args.continue_watching:
         query = (input("Pesquise anime: ") if not args.query else args.query) if not args.debug else "eva"
@@ -83,7 +83,7 @@ def save_history(anime, episode):
             dump(data, f)
 
     except FileNotFoundError:
-        Path(file_path).mkdir(parents=True, exist_ok=True)
+        Path(file_path).parent.mkdir(parents=True, exist_ok=True)
 
         with open(file_path, "w") as f:
             data = dict()

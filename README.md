@@ -31,7 +31,7 @@ sudo apt install python-is-python3 pip python3.12-venv
 
 ## Linux
 ```bash
-git clone https://github.com/eduardonery1/ani-tupi
+git clone https://github.com/lucasdaniellopes/ani-tupi
 cd ani-tupi
 python3 -m venv venv
 source ./venv/bin/activate
@@ -41,7 +41,7 @@ pip3 install -r requirements.txt
 
 ## Windows (Powershell)
 ```powershell
-git clone https://github.com/eduardonery1/ani-tupi
+git clone https://github.com/lucasdaniellopes/ani-tupi
 cd ani-tupi
 python -m venv venv
 venv/Scripts/activate.ps1
