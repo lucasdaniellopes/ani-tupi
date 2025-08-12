@@ -160,7 +160,7 @@ class AnimeDrive(PluginInterface):
                                 mp4_url = urllib.parse.unquote(params['source'][0])
                                 
                                 if mp4_url.endswith('.mp4'):
-                                    if 'eos.feralhosting.com' in mp4_url or 'animeflix.blog' in mp4_url:
+                                    if 'eos.feralhosting.com' in mp4_url or 'animeflix.blog' in mp4_url or 'mangas.cloud' in mp4_url:
                                         all_links.append(mp4_url)
                                     
                 except Exception as e:
@@ -170,7 +170,7 @@ class AnimeDrive(PluginInterface):
             if all_links:
                 chosen_link = None
                 
-                server_priority = ['eos.feralhosting.com', 'animeflix.blog']
+                server_priority = ['eos.feralhosting.com', 'animeflix.blog', 'mangas.cloud']
                 
                 for server in server_priority:
                     server_links = [link for link in all_links if server in link]

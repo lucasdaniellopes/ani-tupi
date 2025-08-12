@@ -38,6 +38,7 @@ source ./venv/bin/activate
 pip3 install --upgrade pip
 pip3 install -r requirements.txt
 ./build.sh
+sudo cp dist/ani-tupi /usr/local/bin/
 ```
 
 ## Windows (Powershell)
